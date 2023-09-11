@@ -5,8 +5,8 @@ import {StatusObject} from "@grpc/grpc-js/src/call-interface";
 
 export default function GrpcError(
    code: Status | null,
-   details: string | null,
-   metadata: Metadata | null,
+   details: string | null = null,
+   metadata: Metadata | null = null,
 ):  Partial<StatusObject> {
    const e = new StatusBuilder()
    if (code) e.withCode(code)
