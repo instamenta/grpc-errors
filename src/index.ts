@@ -7,12 +7,12 @@ export default function GrpcError(
    code: Status | null,
    details: string | null = null,
    metadata: Metadata | null = null,
-): Partial<StatusObject> {
-   const e = new StatusBuilder()
-   if (code) e.withCode(code)
-   if (details) e.withDetails(details)
-   if (metadata) e.withMetadata(metadata)
-   return e.build()
+): StatusBuilder {
+   const e = new StatusBuilder();
+   if (code) e.withCode(code);
+   if (details) e.withDetails(details);
+   if (metadata) e.withMetadata(metadata);
+   return e
 }
 
 export {
