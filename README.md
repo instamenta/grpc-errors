@@ -8,7 +8,7 @@ It simplifies the process of building error objects with customizable error code
 You can install GrpcError using npm:
 
 ```bash
-npm install grpc-error-builder
+npm install @instamenta/grpc-errors
 ```
 
 ## Usage 🚀
