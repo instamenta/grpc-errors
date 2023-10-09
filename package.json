@@ -1,6 +1,6 @@
 {
   "name": "@instamenta/grpc-errors",
-  "version": "1.3.7",
+  "version": "1.3.9",
   "description": "grpc status codes builder for javascript and typescript grpc server responses",
   "types": "./lib/cjs/types/index.d.ts",
   "main": "./lib/cjs/index.js",
