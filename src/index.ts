@@ -258,7 +258,7 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> {
      * @param callback - The callback function to call with the gRPC error.
      * @param _key - The key representing the gRPC error type.
      * @param _source - The source of the error (if available).
-     * @param _metadata - Additional metadata to attach to the gRPC error.
+     * @param _metadata - Additional metadata to attach to the gRPC error. (if available).
      * @param _details - Additional details about the error (if available).
      */
     public CB({
