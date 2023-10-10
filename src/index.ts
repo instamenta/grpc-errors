@@ -231,14 +231,14 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> implements IGrpcErrors
     /**
      * * Emits a gRPC error on a writable stream and logs it.
      *
-     * @param _call - The writable stream on which to emit the gRPC error.
+     * @param call - The writable stream on which to emit the gRPC error.
      * @param _key - The key representing the gRPC error type.
      * @param _source - The source of the error (if available).
      * @param _metadata - Additional metadata to attach to the gRPC error.
      * @param _details - Additional details about the error (if available).
      */
     public EMIT({
-                    _call,
+                    call,
                     _key,
                     _source = null,
                     _metadata = null,
@@ -249,21 +249,21 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> implements IGrpcErrors
         const _error = this.ERRORS[_key];
         if (_metadata) _error.metadata = _metadata;
         if (_details) _error.details = _details;
-        _call.emit('error', _error)
+        call.emit('error', _error)
         return console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
     }
 
     /**
      * * Calls a callback function with a gRPC error and logs it.
      *
-     * @param _callback - The callback function to call with the gRPC error.
+     * @param callback - The callback function to call with the gRPC error.
      * @param _key - The key representing the gRPC error type.
      * @param _source - The source of the error (if available).
      * @param _metadata - Additional metadata to attach to the gRPC error.
      * @param _details - Additional details about the error (if available).
      */
     public CALLBACK({
-                        _callback,
+                        callback,
                         _key,
                         _source = null,
                         _metadata = null,
@@ -274,7 +274,7 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> implements IGrpcErrors
         const _error = this.ERRORS[_key];
         if (_metadata) _error.metadata = _metadata;
         if (_details) _error.details = _details;
-        _callback(_error)
+        callback(_error)
         return console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
     }
 
@@ -319,7 +319,7 @@ export interface I_THROW<T> {
 }
 
 export interface I_EMIT<T> {
-    _call: ServerWritableStream<any, any>;
+    call: ServerWritableStream<any, any>;
     _key: keyof T;
     _source?: string | null;
     _metadata?: null | Metadata;
@@ -327,7 +327,7 @@ export interface I_EMIT<T> {
 }
 
 export interface I_CALLBACK<T> {
-    _callback: sendUnaryData<any>;
+    callback: sendUnaryData<any>;
     _key: keyof T;
     _source?: string | null;
     _metadata?: null | Metadata;
@@ -342,9 +342,9 @@ interface IGrpcErrors<T extends IGrpcErrorKeys> {
 
     THROW({_key, _source, _metadata, _details}: I_THROW<T>): ServerErrorResponse;
 
-    EMIT({_call, _key, _source, _metadata, _details}: I_EMIT<T>): void;
+    EMIT({call, _key, _source, _metadata, _details}: I_EMIT<T>): void;
 
-    CALLBACK({_callback, _key, _source, _metadata, _details}: I_CALLBACK<T>): void;
+    CALLBACK({callback, _key, _source, _metadata, _details}: I_CALLBACK<T>): void;
 
     handleZodError(error: ZodError): ServerErrorResponse;
 }
