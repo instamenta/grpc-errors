@@ -136,9 +136,8 @@ const resourceNotFoundError: ServerErrorResponse = {
  *
  * @template T - string literal type representing gRPC error keys.
  * @class GrpcErrors
- * @implements IGrpcErrors
  */
-export default class GrpcErrors<T extends IGrpcErrorKeys> implements IGrpcErrors<T> {
+export default class GrpcErrors<T extends IGrpcErrorKeys> {
 
     public KEYS: T = {
         INVALID_ARGUMENT: 'INVALID_ARGUMENT',
@@ -333,19 +332,3 @@ export interface I_CALLBACK<T> {
     _metadata?: null | Metadata;
     _details?: string | null;
 }
-
-interface IGrpcErrors<T extends IGrpcErrorKeys> {
-    ERRORS: Record<keyof T, ServerErrorResponse>;
-    KEYS: Record<keyof T, keyof T>;
-
-    EXTEND({_key, _error, _metadata, _details}: I_EXTEND<T>): void;
-
-    THROW({_key, _source, _metadata, _details}: I_THROW<T>): ServerErrorResponse;
-
-    EMIT({call, _key, _source, _metadata, _details}: I_EMIT<T>): void;
-
-    CALLBACK({callback, _key, _source, _metadata, _details}: I_CALLBACK<T>): void;
-
-    handleZodError(error: ZodError): ServerErrorResponse;
-}
-
