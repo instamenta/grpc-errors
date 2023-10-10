@@ -139,7 +139,7 @@ const resourceNotFoundError: ServerErrorResponse = {
  */
 export default class GrpcErrors<T extends IGrpcErrorKeys> {
 
-    public KEYS: T = {
+    public K: T = {
         INVALID_ARGUMENT: 'INVALID_ARGUMENT',
         DEADLINE_EXCEEDED: 'DEADLINE_EXCEEDED',
         NOT_FOUND: 'NOT_FOUND',
@@ -212,7 +212,7 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> {
      * @param _details - Additional details about the error (if available).
      * @returns - The thrown gRPC error response.
      */
-    public THROW({
+    public T({
                      _key,
                      _source = null,
                      _metadata = null,
@@ -236,7 +236,7 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> {
      * @param _metadata - Additional metadata to attach to the gRPC error.
      * @param _details - Additional details about the error (if available).
      */
-    public EMIT({
+    public E({
                     call,
                     _key,
                     _source = null,
@@ -261,7 +261,7 @@ export default class GrpcErrors<T extends IGrpcErrorKeys> {
      * @param _metadata - Additional metadata to attach to the gRPC error.
      * @param _details - Additional details about the error (if available).
      */
-    public CALLBACK({
+    public CB({
                         callback,
                         _key,
                         _source = null,
