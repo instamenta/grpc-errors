@@ -1,5 +1,5 @@
-import {ZodError, ZodIssue} from 'zod';
 import {ServerErrorResponse, Metadata, ServerWritableStream, sendUnaryData} from '@grpc/grpc-js';
+import {ZodError, ZodIssue} from 'zod';
 
 /**
  * Defines interface with default set of keys for gRPC error
@@ -20,166 +20,6 @@ export interface IGrpcErrorKeys {
     VALIDATION: 'VALIDATION';
     UNAUTHORIZED: 'UNAUTHORIZED';
     RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND';
-}
-
-
-/**
- * * Class that provides utility functions for managing gRPC errors.
- * @template T - string literal type representing gRPC error keys.
- * @class GrpcErrors
- * @implements IGrpcErrors
- */
-export default class GrpcErrors<T extends IGrpcErrorKeys> implements IGrpcErrors<T> {
-
-    public KEYS: T = {
-        INVALID_ARGUMENT: 'INVALID_ARGUMENT',
-        DEADLINE_EXCEEDED: 'DEADLINE_EXCEEDED',
-        NOT_FOUND: 'NOT_FOUND',
-        ALREADY_EXISTS: 'ALREADY_EXISTS',
-        PERMISSION_DENIED: 'PERMISSION_DENIED',
-        INTERNAL: 'INTERNAL',
-        UNAVAILABLE: 'UNAVAILABLE',
-        DATA_LOSS: 'DATA_LOSS',
-        UNAUTHENTICATED: 'UNAUTHENTICATED',
-        FAILED_PRECONDITION: 'FAILED_PRECONDITION',
-        VALIDATION: 'VALIDATION',
-        UNAUTHORIZED: 'UNAUTHORIZED',
-        RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
-    } as T;
-
-    /**
-     * A record of gRPC errors, where keys correspond to error codes
-     * and values contain error details.
-     */
-    ERRORS = <Record<keyof T, ServerErrorResponse>>{
-        INVALID_ARGUMENT: invalidArgumentError,
-        DEADLINE_EXCEEDED: deadlineExceededError,
-        NOT_FOUND: notFoundError,
-        ALREADY_EXISTS: alreadyExistsError,
-        PERMISSION_DENIED: permissionDeniedError,
-        INTERNAL: internalError,
-        UNAVAILABLE: unavailableError,
-        DATA_LOSS: dataLossError,
-        UNAUTHENTICATED: unauthenticatedError,
-        FAILED_PRECONDITION: failedPreconditionError,
-        VALIDATION: validationError,
-        UNAUTHORIZED: unauthorizedError,
-        RESOURCE_NOT_FOUND: resourceNotFoundError,
-    };
-
-    /**
-     * * Creates and returns a new instance of the GrpcErrors class.
-     * @template T - string literal type representing gRPC error keys.
-     * @returns - new instance of the GrpcErrors class.
-     */
-    static getInstance<T extends IGrpcErrorKeys>(): GrpcErrors<T> {
-        return new GrpcErrors<T>();
-    }
-
-    /**
-     * * Extends the ERRORS record with a custom gRPC error object.
-     * @param _key - The key representing the custom gRPC error type.
-     * @param _error - The custom gRPC error object to add to the ERRORS record.
-     * @param _metadata - Additional metadata to attach to the custom gRPC error (if available).
-     * @param _details - Additional details about the custom gRPC error (if available).
-     */
-    public EXTEND({
-                      _key,
-                      _error,
-                      _metadata = null,
-                      _details = null,
-                  }: I_EXTEND<T>
-    ): void {
-        this.ERRORS[_key] = _error;
-    }
-
-    /**
-     * Throws a gRPC error and logs it.
-     * @param _key - The key representing the gRPC error type.
-     * @param _source - The source of the error (if available).
-     * @param _metadata - Additional metadata to attach to the gRPC error.
-     * @param _details - Additional details about the error (if available).
-     * @returns - The thrown gRPC error response.
-     */
-    public THROW({
-                     _key,
-                     _source = null,
-                     _metadata = null,
-                     _details = null,
-                 }: I_THROW<T>
-    ): ServerErrorResponse {
-        const key = String(_key)
-        console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
-        const _error = this.ERRORS[_key];
-        if (_metadata) _error.metadata = _metadata;
-        if (_details) _error.details = _details;
-        return _error;
-    }
-
-    /**
-     * Emits a gRPC error on a writable stream and logs it.
-     * @param _call - The writable stream on which to emit the gRPC error.
-     * @param _key - The key representing the gRPC error type.
-     * @param _source - The source of the error (if available).
-     * @param _metadata - Additional metadata to attach to the gRPC error.
-     * @param _details - Additional details about the error (if available).
-     */
-    public EMIT({
-                    _call,
-                    _key,
-                    _source = null,
-                    _metadata = null,
-                    _details = null,
-                }: I_EMIT<T>
-    ): void {
-        const key = String(_key)
-        const _error = this.ERRORS[_key];
-        if (_metadata) _error.metadata = _metadata;
-        if (_details) _error.details = _details;
-        _call.emit('error', _error)
-        return console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
-    }
-
-    /**
-     * Calls a callback function with a gRPC error and logs it.
-     * @param _callback - The callback function to call with the gRPC error.
-     * @param _key - The key representing the gRPC error type.
-     * @param _source - The source of the error (if available).
-     * @param _metadata - Additional metadata to attach to the gRPC error.
-     * @param _details - Additional details about the error (if available).
-     */
-    public CALLBACK({
-                        _callback,
-                        _key,
-                        _source = null,
-                        _metadata = null,
-                        _details = null,
-                    }: I_CALLBACK<T>
-    ): void {
-        const key = String(_key)
-        const _error = this.ERRORS[_key];
-        if (_metadata) _error.metadata = _metadata;
-        if (_details) _error.details = _details;
-        _callback(_error)
-        return console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
-    }
-
-    /**
-     * * Converts a Zod error to a gRPC error response with metadata and details.
-     * @param error - The Zod error to convert.
-     * @returns - The gRPC error response.
-     */
-    public handleZodError(error: ZodError): ServerErrorResponse {
-        const _error = this.ERRORS.VALIDATION;
-        const _metadata = new Metadata();
-        error.errors.forEach((e: ZodIssue, i: number) => {
-            _metadata.set(`error_${i}`, e.message);
-        });
-        _error.metadata = _metadata;
-        _error.details = error.errors.map((e) => e.message).join(', ');
-        return _error;
-    }
-
 }
 
 //! GRPC DEFAULT ERRORS
@@ -287,6 +127,183 @@ const resourceNotFoundError: ServerErrorResponse = {
     message: 'gRPC resource not found.',
 };
 
+
+
+/**
+ * * Class that provides utility functions for managing gRPC errors. Logging meaningful errors to the console.
+ *
+ * ! With unmatched type safety and extendability!
+ *
+ * @template T - string literal type representing gRPC error keys.
+ * @class GrpcErrors
+ * @implements IGrpcErrors
+ */
+export default class GrpcErrors<T extends IGrpcErrorKeys> implements IGrpcErrors<T> {
+
+    public KEYS: T = {
+        INVALID_ARGUMENT: 'INVALID_ARGUMENT',
+        DEADLINE_EXCEEDED: 'DEADLINE_EXCEEDED',
+        NOT_FOUND: 'NOT_FOUND',
+        ALREADY_EXISTS: 'ALREADY_EXISTS',
+        PERMISSION_DENIED: 'PERMISSION_DENIED',
+        INTERNAL: 'INTERNAL',
+        UNAVAILABLE: 'UNAVAILABLE',
+        DATA_LOSS: 'DATA_LOSS',
+        UNAUTHENTICATED: 'UNAUTHENTICATED',
+        FAILED_PRECONDITION: 'FAILED_PRECONDITION',
+        VALIDATION: 'VALIDATION',
+        UNAUTHORIZED: 'UNAUTHORIZED',
+        RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
+    } as T;
+
+    /**
+     * A record of gRPC errors, where keys correspond to error codes
+     * and values contain error details.
+     */
+    ERRORS = <Record<keyof T, ServerErrorResponse>>{
+        INVALID_ARGUMENT: invalidArgumentError,
+        DEADLINE_EXCEEDED: deadlineExceededError,
+        NOT_FOUND: notFoundError,
+        ALREADY_EXISTS: alreadyExistsError,
+        PERMISSION_DENIED: permissionDeniedError,
+        INTERNAL: internalError,
+        UNAVAILABLE: unavailableError,
+        DATA_LOSS: dataLossError,
+        UNAUTHENTICATED: unauthenticatedError,
+        FAILED_PRECONDITION: failedPreconditionError,
+        VALIDATION: validationError,
+        UNAUTHORIZED: unauthorizedError,
+        RESOURCE_NOT_FOUND: resourceNotFoundError,
+    };
+
+    /**
+     * * Creates and returns a new instance of the GrpcErrors class.
+     *
+     * @template T - string literal type representing gRPC error keys.
+     * @returns - new instance of the GrpcErrors class.
+     */
+    static getInstance<T extends IGrpcErrorKeys>(): GrpcErrors<T> {
+        return new GrpcErrors<T>();
+    }
+
+    /**
+     * * Extends the ERRORS record with a custom gRPC error object.
+     *
+     * @param _key - The key representing the custom gRPC error type.
+     * @param _error - The custom gRPC error object to add to the ERRORS record.
+     * @param _metadata - Additional metadata to attach to the custom gRPC error (if available).
+     * @param _details - Additional details about the custom gRPC error (if available).
+     */
+    public EXTEND({
+                      _key,
+                      _error,
+                      _metadata = null,
+                      _details = null,
+                  }: I_EXTEND<T>
+    ): void {
+        this.ERRORS[_key] = _error;
+    }
+
+    /**
+     * * Throws a gRPC error and logs it.
+     *
+     * @param _key - The key representing the gRPC error type.
+     * @param _source - The source of the error (if available).
+     * @param _metadata - Additional metadata to attach to the gRPC error.
+     * @param _details - Additional details about the error (if available).
+     * @returns - The thrown gRPC error response.
+     */
+    public THROW({
+                     _key,
+                     _source = null,
+                     _metadata = null,
+                     _details = null,
+                 }: I_THROW<T>
+    ): ServerErrorResponse {
+        const key = String(_key)
+        console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
+        const _error = this.ERRORS[_key];
+        if (_metadata) _error.metadata = _metadata;
+        if (_details) _error.details = _details;
+        return _error;
+    }
+
+    /**
+     * * Emits a gRPC error on a writable stream and logs it.
+     *
+     * @param _call - The writable stream on which to emit the gRPC error.
+     * @param _key - The key representing the gRPC error type.
+     * @param _source - The source of the error (if available).
+     * @param _metadata - Additional metadata to attach to the gRPC error.
+     * @param _details - Additional details about the error (if available).
+     */
+    public EMIT({
+                    _call,
+                    _key,
+                    _source = null,
+                    _metadata = null,
+                    _details = null,
+                }: I_EMIT<T>
+    ): void {
+        const key = String(_key)
+        const _error = this.ERRORS[_key];
+        if (_metadata) _error.metadata = _metadata;
+        if (_details) _error.details = _details;
+        _call.emit('error', _error)
+        return console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
+    }
+
+    /**
+     * * Calls a callback function with a gRPC error and logs it.
+     *
+     * @param _callback - The callback function to call with the gRPC error.
+     * @param _key - The key representing the gRPC error type.
+     * @param _source - The source of the error (if available).
+     * @param _metadata - Additional metadata to attach to the gRPC error.
+     * @param _details - Additional details about the error (if available).
+     */
+    public CALLBACK({
+                        _callback,
+                        _key,
+                        _source = null,
+                        _metadata = null,
+                        _details = null,
+                    }: I_CALLBACK<T>
+    ): void {
+        const key = String(_key)
+        const _error = this.ERRORS[_key];
+        if (_metadata) _error.metadata = _metadata;
+        if (_details) _error.details = _details;
+        _callback(_error)
+        return console.log(_source ? `[ Emitting GRPC ERROR: [ ${key} ] from "${_source}" ]` : `[ Emitting ERROR: [ ${key} ] ]`);
+    }
+
+    /**
+     * * Converts a Zod error to a gRPC error response with metadata and details.
+     *
+     * @param error - The Zod error to convert.
+     * @returns - The gRPC error response.
+     */
+    public handleZodError(error: ZodError): ServerErrorResponse {
+        const _error = this.ERRORS.VALIDATION;
+        const _metadata = new Metadata();
+        error?.errors?.forEach((e: ZodIssue, i: number) => {
+            _metadata.set(`error_${i}`, e.message);
+        });
+        _error.metadata = _metadata;
+        _error.details = error?.errors?.map((e) => e.message).join(', ');
+        return _error;
+    }
+
+}
+
+/**
+ * * Get default Class instance.
+ *
+ * @type {GrpcErrors<IGrpcErrorKeys>}
+ */
+export const w = GrpcErrors.getInstance<IGrpcErrorKeys>();
+
 export interface I_EXTEND<T> {
     _key: keyof T;
     _error: ServerErrorResponse;
@@ -332,5 +349,3 @@ interface IGrpcErrors<T extends IGrpcErrorKeys> {
     handleZodError(error: ZodError): ServerErrorResponse;
 }
 
-/** Get default Class instance */
-export const w = GrpcErrors.getInstance<IGrpcErrorKeys>();
