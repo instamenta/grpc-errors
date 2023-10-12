@@ -1,4 +1,4 @@
-import {ServerErrorResponse, Metadata, ServerWritableStream, sendUnaryData} from '@grpc/grpc-js';
+import {ServerErrorResponse, Metadata, ServerWritableStream, sendUnaryData, MetadataValue} from '@grpc/grpc-js';
 import {ZodError, ZodIssue} from 'zod';
 
 /**
@@ -127,7 +127,23 @@ const resourceNotFoundError: ServerErrorResponse = {
     message: 'gRPC resource not found.',
 };
 
+/** Tired of boring old meta whose methods cant be chained? Try this! Simple yet wonderful */
+export class Meta {
+    #metadata: Metadata = new Metadata();
 
+    public set(key: string, value: MetadataValue): this {
+        this.#metadata.set(key, value);
+        return this;
+    }
+
+    public get(): Metadata {
+        return this.#metadata;
+    }
+
+    public build(): Meta {
+        return new Meta();
+    }
+}
 
 /**
  * * Class that provides utility functions for managing gRPC errors. Logging meaningful errors to the console.
