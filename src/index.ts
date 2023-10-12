@@ -140,7 +140,7 @@ export class Meta {
         return this.#metadata;
     }
 
-    public build(): Meta {
+    static build(): Meta {
         return new Meta();
     }
 }
